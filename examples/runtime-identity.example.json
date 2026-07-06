@@ -1,0 +1,42 @@
+{
+  "schema": "sketchup-runtime-guard.identity.v1",
+  "checked_at": "2026-07-06T12:00:00Z",
+  "lane_id": "lane-example-001",
+  "result": "runtime_identity_proven",
+  "sketchup": {
+    "pid": 12345,
+    "version": "2026.0",
+    "launched_by_lane": true
+  },
+  "plugin": {
+    "name": "ExamplePlugin",
+    "root": "/tmp/sketchup-runtime-guard/lane-example-001/home/Library/Application Support/SketchUp 2026/SketchUp/Plugins",
+    "dir": "/tmp/sketchup-runtime-guard/lane-example-001/home/Library/Application Support/SketchUp 2026/SketchUp/Plugins/ExamplePlugin",
+    "entrypoint": "ExamplePlugin.rb"
+  },
+  "environment": {
+    "CFFIXED_USER_HOME": "/tmp/sketchup-runtime-guard/lane-example-001/home",
+    "HOME": "/tmp/sketchup-runtime-guard/lane-example-001/home",
+    "APPDATA": "/tmp/sketchup-runtime-guard/lane-example-001/home",
+    "TMPDIR": "/tmp/sketchup-runtime-guard/lane-example-001/tmp"
+  },
+  "bridge": {
+    "host": "127.0.0.1",
+    "port": 49152,
+    "pid_bound": true
+  },
+  "model": {
+    "path": "/tmp/sketchup-runtime-guard/lane-example-001/models/validation.skp",
+    "sha256": "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
+  },
+  "runtime": {
+    "pid": 23456,
+    "path": "/tmp/sketchup-runtime-guard/lane-example-001/home/Library/Application Support/SketchUp 2026/SketchUp/Plugins/ExamplePlugin/lib/stage/macos/example_runtime",
+    "actual_sha256": "ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789",
+    "expected_sha256": "ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789",
+    "manifest_path": "/tmp/sketchup-runtime-guard/lane-example-001/home/Library/Application Support/SketchUp 2026/SketchUp/Plugins/ExamplePlugin/lib/stage/macos/example_runtime.stage.json"
+  },
+  "notes": [
+    "This file is synthetic. Replace placeholders with values collected from the live SketchUp session."
+  ]
+}
