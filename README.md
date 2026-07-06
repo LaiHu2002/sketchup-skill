@@ -1,12 +1,54 @@
 # SketchUp Runtime Guard
 
+[![Validate](https://github.com/LaiHu2002/sketchup-skill/actions/workflows/validate.yml/badge.svg)](https://github.com/LaiHu2002/sketchup-skill/actions/workflows/validate.yml)
+
 **Suggested GitHub description:** Codex skill for isolated SketchUp plugin launches and runtime identity proof before visual QA.
+
+> "The bridge responds" is not evidence. Prove which SketchUp process, plugin directory, model, and native runtime are actually live.
 
 SketchUp Runtime Guard is a small, agent-friendly method for launching and validating SketchUp plugin development sessions without trusting stale processes, shared plugin directories, old bridge ports, or cached runtime binaries.
 
 The core idea is simple: before a visual QA result is accepted, prove which SketchUp process, plugin directory, model, bridge endpoint, and local runtime binary are actually live.
 
 This repository is intentionally small. It is a reusable SketchUp plugin validation skill and reference checklist, not a project-specific deployment system.
+
+## Before And After
+
+| Before | After |
+| --- | --- |
+| Bridge is reachable. Maybe it is the right SketchUp session. | SketchUp PID, plugin dir, model path, bridge port, runtime path, and runtime SHA256 are all checked. |
+| Files were copied, so the build is probably deployed. | File sync and live runtime identity are reported as separate states. |
+| A screenshot failed, so the plugin might be broken. | Environment failures, dirty runtime identity, and actual plugin failures are separated. |
+
+## Quick Demo
+
+Validate the included synthetic identity and ledger:
+
+```bash
+ruby scripts/validate_runtime_identity.rb \
+  --identity examples/runtime-identity.example.json \
+  --ledger examples/session-ledger.example.json \
+  --quiet
+```
+
+Expected result:
+
+```text
+PASS
+```
+
+Generate a local identity JSON from explicit paths or environment variables:
+
+```bash
+ruby scripts/probe_sketchup_identity.rb \
+  --lane-id lane-local \
+  --plugin-name ExamplePlugin \
+  --plugin-dir /tmp/sketchup-runtime-guard/lane-local/Plugins/ExamplePlugin \
+  --model-path /tmp/sketchup-runtime-guard/lane-local/models/validation.skp \
+  --bridge-port 49152 \
+  --runtime-path /tmp/sketchup-runtime-guard/lane-local/Plugins/ExamplePlugin/lib/example_runtime \
+  --expected-sha256 ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789
+```
 
 ## Why This Exists
 
@@ -36,6 +78,8 @@ Do not collapse these into one "deployed" status. Copying files does not prove t
 
 - `skills/sketchup-runtime-guard/SKILL.md`: a Codex skill for planning and verifying isolated SketchUp plugin validation runs.
 - `skills/sketchup-runtime-guard/agents/openai.yaml`: optional UI metadata for skill lists.
+- `scripts/probe_sketchup_identity.rb`: emits a normalized runtime identity report from explicit paths, environment variables, or a live SketchUp Ruby context.
+- `scripts/validate_runtime_identity.rb`: validates an identity report, optionally against a session ledger.
 - `examples/runtime-identity.example.json`: a sanitized runtime identity report.
 - `examples/session-ledger.example.json`: a sanitized lane/session ledger entry.
 - `SECURITY.md`: publication and diagnostic safety notes.
@@ -56,6 +100,17 @@ Use $sketchup-runtime-guard to validate this SketchUp plugin session before visu
 ```
 
 The skill is written to stay vendor-neutral. Adapt the placeholder plugin name, runtime binary name, manifest schema, and bridge protocol to your own SketchUp plugin.
+
+## Flow
+
+```mermaid
+flowchart LR
+  A["Sync files"] --> B["Launch isolated SketchUp lane"]
+  B --> C["Probe live Ruby session"]
+  C --> D["Check plugin dir and model hash"]
+  D --> E["Check runtime path and SHA256"]
+  E --> F["GUI ready for visual QA"]
+```
 
 ## Suggested macOS Lane Shape
 
@@ -88,6 +143,47 @@ A useful identity report should include:
 
 See `examples/runtime-identity.example.json` for a compact example.
 
+## Scripts
+
+### `probe_sketchup_identity.rb`
+
+Use this when you need a normalized JSON report. It can run in plain Ruby with explicit paths, or inside SketchUp Ruby where `Sketchup.active_model` and `Sketchup.version` are available.
+
+Important inputs:
+
+- `--plugin-dir`
+- `--model-path`
+- `--bridge-port`
+- `--runtime-path`
+- `--expected-sha256` or `--manifest`
+
+It does not launch SketchUp or claim GUI success. It only records identity facts.
+
+### `validate_runtime_identity.rb`
+
+Use this as a small gate before accepting evidence:
+
+```bash
+ruby scripts/validate_runtime_identity.rb --identity runtime-identity.json --ledger session-ledger.json
+```
+
+It fails when required fields are missing, the runtime hash does not match, the runtime path is outside the plugin directory, or the identity report disagrees with the ledger.
+
+Use `--quiet` when a CI-like script only needs `PASS` or `FAIL`.
+
+## Validation
+
+Run the local checks:
+
+```bash
+ruby -c scripts/probe_sketchup_identity.rb
+ruby -c scripts/validate_runtime_identity.rb
+ruby scripts/validate_runtime_identity.rb \
+  --identity examples/runtime-identity.example.json \
+  --ledger examples/session-ledger.example.json \
+  --quiet
+```
+
 ## Safety Rules
 
 - Never kill every SketchUp process by default. Only stop processes registered to the current lane.
@@ -113,7 +209,7 @@ visual-qa
 
 ## Status
 
-This first public version is intentionally documentation-first. It captures the validation model and a Codex skill without shipping project-specific automation scripts. Add scripts only after adapting the placeholders to your own plugin name, runtime binary name, manifest schema, and bridge protocol.
+This first public version captures the validation model, a Codex skill, and two small Ruby scripts. The scripts are intentionally generic: adapt the plugin name, runtime binary name, manifest schema, and bridge protocol to your own SketchUp plugin.
 
 ## License
 
