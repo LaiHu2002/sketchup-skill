@@ -1,0 +1,7 @@
+interface:
+  display_name: "SketchUp Runtime Guard"
+  short_description: "Prove SketchUp plugin runtime identity"
+  default_prompt: "Use $sketchup-runtime-guard to validate this SketchUp plugin session before visual QA."
+
+policy:
+  allow_implicit_invocation: true
