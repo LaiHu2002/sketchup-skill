@@ -1,0 +1,36 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Ruby version
+        run: ruby -v
+
+      - name: Check Ruby syntax
+        run: |
+          ruby -c scripts/probe_sketchup_identity.rb
+          ruby -c scripts/validate_runtime_identity.rb
+
+      - name: Validate YAML metadata
+        run: |
+          ruby -e 'require "yaml"; text = File.read("skills/sketchup-runtime-guard/SKILL.md"); fm = text.split(/^---\s*$/, 3)[1]; data = YAML.safe_load(fm); abort("bad skill name") unless data["name"] == "sketchup-runtime-guard"; YAML.safe_load(File.read("skills/sketchup-runtime-guard/agents/openai.yaml"))'
+
+      - name: Validate JSON examples
+        run: |
+          ruby -rjson -e 'JSON.parse(File.read("examples/runtime-identity.example.json")); JSON.parse(File.read("examples/session-ledger.example.json"))'
+
+      - name: Validate runtime identity example
+        run: |
+          ruby scripts/validate_runtime_identity.rb \
+            --identity examples/runtime-identity.example.json \
+            --ledger examples/session-ledger.example.json \
+            --quiet
