@@ -117,6 +117,8 @@ Identity passes only when:
 
 If the expected hash is missing, fail closed unless the user explicitly requested an unverified local development run.
 
+If this repository's helper scripts are available, use `scripts/probe_sketchup_identity.rb` to emit a normalized identity report and `scripts/validate_runtime_identity.rb` to check it against the lane ledger. Treat those scripts as evidence helpers, not as a SketchUp launcher.
+
 ## Result Levels
 
 Report results with precise language:
