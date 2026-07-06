@@ -1,0 +1,15 @@
+.DS_Store
+tmp/
+logs/
+artifacts/
+*.log
+*.skp
+*.skb
+*.rbz
+*.zip
+*.tar.gz
+*.stage.json
+runtime-identity*.json
+session-ledger*.json
+!.gitignore
+!examples/*.json
